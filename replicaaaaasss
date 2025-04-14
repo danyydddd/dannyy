@@ -1,0 +1,101 @@
+local player = game.Players.LocalPlayer
+local TweenService = game:GetService("TweenService")
+
+-- Wait 3 seconds before showing GUI
+wait(3)
+
+-- GUI setup
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "AutoFarmGUI"
+screenGui.Parent = player:WaitForChild("PlayerGui")
+screenGui.ResetOnSpawn = false
+
+-- Main frame
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 200, 0, 50)
+frame.Position = UDim2.new(0.5, -110, 0.8, 0)
+frame.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+frame.BorderSizePixel = 0
+frame.Active = true
+frame.Draggable = true
+frame.BackgroundTransparency = 1
+frame.Parent = screenGui
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 12)
+corner.Parent = frame
+
+local stroke = Instance.new("UIStroke")
+stroke.Thickness = 2
+stroke.Color = Color3.fromRGB(225, 0, 50)
+stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+stroke.Parent = frame
+
+local shadow = Instance.new("ImageLabel")
+shadow.Size = UDim2.new(1, 20, 1, 20)
+shadow.Position = UDim2.new(0, -10, 0, -10)
+shadow.BackgroundTransparency = 1
+shadow.Image = "rbxassetid://1316045217"
+shadow.ImageTransparency = 0.8
+shadow.ZIndex = 0
+shadow.Parent = frame
+
+local button = Instance.new("TextButton")
+button.Size = UDim2.new(1, -20, 1, -20)
+button.Position = UDim2.new(0, 10, 0, 10)
+button.Text = "Fast Replica Farm"
+button.BackgroundColor3 = Color3.fromRGB(0, 225, 0)
+button.TextColor3 = Color3.new(1, 1, 1)
+button.Font = Enum.Font.GothamBold
+button.TextSize = 17
+button.ZIndex = 1
+button.BackgroundTransparency = 1
+button.TextTransparency = 1
+button.Parent = frame
+
+local buttonCorner = Instance.new("UICorner")
+buttonCorner.CornerRadius = UDim.new(0, 7)
+buttonCorner.Parent = button
+
+-- Fade in effect
+TweenService:Create(frame, TweenInfo.new(1), {BackgroundTransparency = 0}):Play()
+TweenService:Create(shadow, TweenInfo.new(1), {ImageTransparency = 0.9}):Play()
+TweenService:Create(button, TweenInfo.new(1), {
+    BackgroundTransparency = 0,
+    TextTransparency = 0
+}):Play()
+
+-- Click sound (create once)
+local clickSound = Instance.new("Sound")
+clickSound.SoundId = "rbxassetid://6042053626"
+clickSound.Volume = 0.3
+clickSound.Parent = button
+
+-- Auto farm logic
+local farming = false
+local args = {
+    [1] = true
+}
+
+task.spawn(function()
+    while true do
+        if farming then
+            game:GetService("ReplicatedStorage"):WaitForChild("Duplicate"):FireServer(unpack(args))
+        end
+        wait(5.5)
+    end
+end)
+
+-- Button toggle (connect only once)
+button.MouseButton1Click:Connect(function()
+    clickSound:Play()
+
+    farming = not farming
+    if farming then
+        button.Text = " Stop Farming"
+        button.BackgroundColor3 = Color3.fromRGB(255, 85, 85)
+    else
+        button.Text = "Fast Replica Farm"
+        button.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+    end
+end)
